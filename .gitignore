@@ -4,3 +4,4 @@
 */.ipynb_checkpoints/*
 ix-lab2/notebooks/.ipynb_checkpoints/
 ix-lab2/notebooks/.ipynb_checkpoints/*
+*.npy
