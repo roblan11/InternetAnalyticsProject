@@ -1,0 +1,6 @@
+{"movieId": 1, "rating": 4, "timestamp": 1494374537, "userId": 138494}
+{"movieId": 780, "rating": 3, "timestamp": 1494374539, "userId": 138494}
+{"movieId": 1210, "rating": 3, "timestamp": 1494374544, "userId": 138494}
+{"movieId": 648, "rating": 3, "timestamp": 1494374546, "userId": 138494}
+{"movieId": 344, "rating": 5, "timestamp": 1494374549, "userId": 138494}
+{"movieId": 1580, "rating": 4, "timestamp": 1494374558, "userId": 138494}
