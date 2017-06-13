@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>lab4-1-vsm</title>
+<title>lab4-2-lsi</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -11751,7 +11751,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Text-1:-Vector-space-models">Text 1: Vector space models<a class="anchor-link" href="#Text-1:-Vector-space-models">&#182;</a></h1><p><strong>Internet Analytics - Lab 4</strong></p>
+<h1 id="Text-2:-Latent-semantic-indexing">Text 2: Latent semantic indexing<a class="anchor-link" href="#Text-2:-Latent-semantic-indexing">&#182;</a></h1><p><strong>Internet Analytics - Lab 4</strong></p>
 <hr>
 <p><strong>Group:</strong> K</p>
 <p><strong>Names:</strong></p>
@@ -11760,7 +11760,7 @@ div#notebook {
 <li>Robin Lang</li>
 </ul>
 <hr>
-<h4 id="Instructions">Instructions<a class="anchor-link" href="#Instructions">&#182;</a></h4><p><em>This is a template for part 1 of the lab. Clearly write your answers, comments and interpretations in Markodown cells. Don't forget that you can add $\LaTeX$ equations in these cells. Feel free to add or remove any cell.</em></p>
+<h4 id="Instructions">Instructions<a class="anchor-link" href="#Instructions">&#182;</a></h4><p><em>This is a template for part 2 of the lab. Clearly write your answers, comments and interpretations in Markodown cells. Don't forget that you can add $\LaTeX$ equations in these cells. Feel free to add or remove any cell.</em></p>
 <p><em>Please properly comment your code. Code readability will be considered for grading. To avoid long cells of codes in the notebook, you can also embed long python functions and classes in a separate module. Don’t forget to hand in your module if that is the case. In multiple exercises, you are required to come up with your own method to solve various problems. Be creative and clearly motivate and explain your methods. Creativity and clarity will be considered for grading.</em></p>
 
 </div>
@@ -11773,197 +11773,106 @@ div#notebook {
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">pickle</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">scipy.sparse</span> <span class="k">import</span> <span class="n">csr_matrix</span>
-<span class="kn">from</span> <span class="nn">utils</span> <span class="k">import</span> <span class="n">load_json</span><span class="p">,</span> <span class="n">load_pkl</span>
-
-<span class="kn">from</span> <span class="nn">nltk.stem.wordnet</span> <span class="k">import</span> <span class="n">WordNetLemmatizer</span>
-
-<span class="c1"># load the files and initialize the punctiuation to remove</span>
-<span class="n">courses</span> <span class="o">=</span> <span class="n">load_json</span><span class="p">(</span><span class="s1">&#39;data/courses.txt&#39;</span><span class="p">)</span>
-<span class="n">stopwords</span> <span class="o">=</span> <span class="n">load_pkl</span><span class="p">(</span><span class="s1">&#39;data/stopwords.pkl&#39;</span><span class="p">)</span>
-<span class="n">punctuation</span> <span class="o">=</span> <span class="s1">&#39;.?!,;:-–()[]</span><span class="si">{}</span><span class="s1">&quot;/</span><span class="se">\&#39;</span><span class="s1">0123456789%*+=&#39;</span>
+<span class="kn">from</span> <span class="nn">scipy.sparse.linalg</span> <span class="k">import</span> <span class="n">svds</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Exercise-4.1:-Pre-processing">Exercise 4.1: Pre-processing<a class="anchor-link" href="#Exercise-4.1:-Pre-processing">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Pre-process-the-corpus-to-create-bag-of-words-representations-of-each-document">Pre-process the corpus to create bag-of-words representations of each document<a class="anchor-link" href="#Pre-process-the-corpus-to-create-bag-of-words-representations-of-each-document">&#182;</a></h3>
-</div>
-</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># initialize the minimum and maximum times any term may appear</span>
-<span class="c1"># terms that occur less than MIN</span>
-<span class="c1"># or more than MAX times get filtered</span>
-<span class="n">MIN</span> <span class="o">=</span> <span class="mi">10</span>
-<span class="n">MAX</span> <span class="o">=</span> <span class="mi">2000</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># load the arrays from the first part</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/TFIDF.npy&quot;</span><span class="p">)</span>
+<span class="n">X</span> <span class="o">=</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span>
+<span class="n">words</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/words.npy&quot;</span><span class="p">)</span>
+<span class="n">courses</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/courses.npy&quot;</span><span class="p">)</span>
 
-<span class="c1"># note: downloading wordnet is required</span>
-<span class="c1"># command: python -m nltk.downloader</span>
-<span class="c1">#   in the console</span>
-<span class="n">lemmatizer</span> <span class="o">=</span> <span class="n">WordNetLemmatizer</span><span class="p">()</span>
+<span class="c1"># initialize the array sizes for SVD</span>
+<span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words</span><span class="p">)</span>
+<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courses</span><span class="p">)</span>
+<span class="n">K</span> <span class="o">=</span> <span class="mi">300</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exercise-4.4:-Latent-semantic-indexing">Exercise 4.4: Latent semantic indexing<a class="anchor-link" href="#Exercise-4.4:-Latent-semantic-indexing">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Apply-SVD-with-K-=-300-to-your-term-document-matrix-X-from-the-previous-exercise.">Apply SVD with K = 300 to your term-document matrix X from the previous exercise.<a class="anchor-link" href="#Apply-SVD-with-K-=-300-to-your-term-document-matrix-X-from-the-previous-exercise.">&#182;</a></h3>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># function to construct n-grams of any length n</span>
-<span class="c1"># based on the solution found on</span>
-<span class="c1"># http://locallyoptimal.com/blog/2013/01/20/elegant-n-gram-generation-in-python/</span>
-<span class="k">def</span> <span class="nf">find_ngrams</span><span class="p">(</span><span class="n">input_list</span><span class="p">,</span> <span class="n">n</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot; &quot;</span> <span class="o">+</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="n">input_list</span><span class="p">[</span><span class="n">i</span><span class="p">:]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n</span><span class="p">)]))</span> <span class="p">]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># compute the SVD of X</span>
+<span class="n">U</span><span class="p">,</span> <span class="n">S</span><span class="p">,</span> <span class="n">VT</span> <span class="o">=</span> <span class="n">svds</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">k</span><span class="o">=</span><span class="n">K</span><span class="p">)</span>
+<span class="n">V</span> <span class="o">=</span> <span class="n">VT</span><span class="o">.</span><span class="n">T</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Describe-the-rows-and-columns-of-U-and-V,-and-the-values-of-S.">Describe the rows and columns of U and V, and the values of S.<a class="anchor-link" href="#Describe-the-rows-and-columns-of-U-and-V,-and-the-values-of-S.">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>The rows of U are the left singular eigenvectors. Each row is the topic distribution of a term.</p>
+<p>The columns of V are the right singular eigenvectors. Each row is the topic distribution of a course description.</p>
+<p>The values in S are the eigenvalues, ordered from smallest to largest. This gives an "importance" to each topic. So a high value in S for a topic means that topic is more frequent within the corpus.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Print-the-top-20-eigenvalues-of-X">Print the top-20 eigenvalues of X<a class="anchor-link" href="#Print-the-top-20-eigenvalues-of-X">&#182;</a></h3>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[4]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">courses_proc</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">words</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="c1"># construct the dictionaries for the courses and terms</span>
-<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses</span><span class="p">:</span>
-    <span class="n">cid</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;courseId&#39;</span><span class="p">]</span>
-    
-    <span class="c1"># transfer all to lowercase, remove punctuation and numbers</span>
-    <span class="n">desc</span> <span class="o">=</span> <span class="n">c</span><span class="p">[</span><span class="s1">&#39;description&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="nb">str</span><span class="o">.</span><span class="n">maketrans</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">punctuation</span><span class="p">))</span>
-    <span class="c1"># remove stopwords</span>
-    <span class="n">desc_proc</span> <span class="o">=</span> <span class="p">[</span><span class="n">lemmatizer</span><span class="o">.</span><span class="n">lemmatize</span><span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="n">pos</span><span class="o">=</span><span class="s1">&#39;v&#39;</span><span class="p">)</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">desc</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">]</span>
-    
-    <span class="n">desc_2grams</span> <span class="o">=</span> <span class="n">find_ngrams</span><span class="p">(</span><span class="n">desc_proc</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="n">desc_proc</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">desc_2grams</span><span class="p">)</span>
-    
-    <span class="c1"># create a dict of all words</span>
-    <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">desc_proc</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
-            <span class="n">words</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">words</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span>
-    
-    <span class="k">if</span> <span class="n">cid</span> <span class="ow">in</span> <span class="n">courses_proc</span><span class="p">:</span>
-        <span class="c1"># some courseIds appear multiple times</span>
-        <span class="c1"># for those, we decided to append the desctiptions to each other</span>
-        <span class="n">courses_proc</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">desc_proc</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">courses_proc</span><span class="p">[</span><span class="n">cid</span><span class="p">]</span> <span class="o">=</span> <span class="n">desc_proc</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[5]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">words_filtered</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="c1"># filter most and least frequent words</span>
-<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words</span><span class="p">:</span>
-    <span class="k">if</span> <span class="n">words</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">MIN</span> <span class="ow">and</span> <span class="n">words</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">MAX</span><span class="p">:</span>
-        <span class="n">words_filtered</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[6]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">courses_proc2</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="c1"># remove all the words that have been filtered out from the descriptions</span>
-<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses_proc</span><span class="p">:</span>
-    <span class="n">courses_proc2</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">word</span> <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">courses_proc</span><span class="p">[</span><span class="n">c</span><span class="p">]</span> <span class="k">if</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">words_filtered</span><span class="p">]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Explain-which-kinds-of-cleaning-you-implemented-and-why">Explain which kinds of cleaning you implemented and why<a class="anchor-link" href="#Explain-which-kinds-of-cleaning-you-implemented-and-why">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<ul>
-<li>Make sure every courseId only appears once. If it appears more than once, append the two descriptions</li>
-<li>Change all cheacters to lowercase, to avoid the same word being considered different. Additionally, all words in stopwords.pkl are in lowercase, so this ensures all words are removed correctly</li>
-<li>Remove punctuation, numbers and other symbols, for the same reason as above. Only the words are important, not percentages or numbers.</li>
-<li>Remove stopwords, as these don't carry any information about the content of the document</li>
-<li>filter most and least frequent words, as they only mess up the results when trying to find similarities between documents. commomn words will be in almost every document, rare ones in almost none.</li>
-<li>Lemmatization, to detect only words with different meaning. Identical words, such as "is" and "are" will automatically be transformed to "be", the same is true with multiples ("documents" -&gt; "document").</li>
-<li>n-grams: 2-shingles, to detect frequent combinations of words. Infrequent shingles are filtered just like infrequent words. No higher degrees for the sake of performance.</li>
-</ul>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Print-the-terms-in-the-pre-processed-description-of-the-$9^{th}$-class-in-alphabetical-order.">Print the terms in the pre-processed description of the $9^{th}$ class in alphabetical order.<a class="anchor-link" href="#Print-the-terms-in-the-pre-processed-description-of-the-$9^{th}$-class-in-alphabetical-order.">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[7]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># print the fill description of the 9th course</span>
-<span class="nb">print</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">courses_proc2</span><span class="p">[</span><span class="n">courses</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="s1">&#39;courseId&#39;</span><span class="p">]]))</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;LARGEST 20 EIGENVALUES:&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">S</span><span class="p">[:</span><span class="o">-</span><span class="mi">21</span><span class="p">:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -11976,7 +11885,11 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>[&#39;abstract&#39;, &#39;abstract&#39;, &#39;abstract&#39;, &#39;activities&#39;, &#39;activities&#39;, &#39;activities&#39;, &#39;activities attend&#39;, &#39;activities attend&#39;, &#39;activities attend&#39;, &#39;al&#39;, &#39;al&#39;, &#39;al&#39;, &#39;algorithmic&#39;, &#39;algorithmic&#39;, &#39;algorithmic&#39;, &#39;architecture&#39;, &#39;architecture&#39;, &#39;architecture&#39;, &#39;assessment&#39;, &#39;assessment&#39;, &#39;assessment&#39;, &#39;assessment methods&#39;, &#39;assessment methods&#39;, &#39;assessment methods&#39;, &#39;assistants&#39;, &#39;assistants&#39;, &#39;assistants&#39;, &#39;assistants forum&#39;, &#39;assistants forum&#39;, &#39;assistants forum&#39;, &#39;attend&#39;, &#39;attend&#39;, &#39;attend&#39;, &#39;attend lecture&#39;, &#39;attend lecture&#39;, &#39;attend lecture&#39;, &#39;automation&#39;, &#39;automation&#39;, &#39;automation&#39;, &#39;basic&#39;, &#39;basic&#39;, &#39;basic&#39;, &#39;bibliography&#39;, &#39;bibliography&#39;, &#39;bibliography&#39;, &#39;bibliothèque&#39;, &#39;bibliothèque&#39;, &#39;bibliothèque&#39;, &#39;build&#39;, &#39;build&#39;, &#39;build&#39;, &#39;challenge&#39;, &#39;challenge&#39;, &#39;challenge&#39;, &#39;cod&#39;, &#39;cod&#39;, &#39;cod&#39;, &#39;combinational&#39;, &#39;combinational&#39;, &#39;combinational&#39;, &#39;comment&#39;, &#39;comment&#39;, &#39;comment&#39;, &#39;complete&#39;, &#39;complete&#39;, &#39;complete&#39;, &#39;complete exercise&#39;, &#39;complete exercise&#39;, &#39;complete exercise&#39;, &#39;complex&#39;, &#39;complex&#39;, &#39;complex&#39;, &#39;components&#39;, &#39;components&#39;, &#39;components&#39;, &#39;computation&#39;, &#39;computation&#39;, &#39;computation&#39;, &#39;concepts&#39;, &#39;concepts&#39;, &#39;concepts&#39;, &#39;concepts&#39;, &#39;concepts&#39;, &#39;concepts&#39;, &#39;concepts start&#39;, &#39;concepts start&#39;, &#39;concepts start&#39;, &#39;content introduction&#39;, &#39;content introduction&#39;, &#39;content introduction&#39;, &#39;control&#39;, &#39;control&#39;, &#39;control&#39;, &#39;creation&#39;, &#39;creation&#39;, &#39;creation&#39;, &#39;cs&#39;, &#39;cs&#39;, &#39;cs&#39;, &#39;de&#39;, &#39;de&#39;, &#39;de&#39;, &#39;definition&#39;, &#39;definition&#39;, &#39;definition&#39;, &#39;deliver&#39;, &#39;deliver&#39;, &#39;deliver&#39;, &#39;describe&#39;, &#39;describe&#39;, &#39;describe&#39;, &#39;description&#39;, &#39;description&#39;, &#39;description&#39;, &#39;description&#39;, &#39;description&#39;, &#39;description&#39;, &#39;design automation&#39;, &#39;design automation&#39;, &#39;design automation&#39;, &#39;design control&#39;, &#39;design control&#39;, &#39;design control&#39;, &#39;design methodologies&#39;, &#39;design methodologies&#39;, &#39;design methodologies&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;design vhdl&#39;, &#39;develop&#39;, &#39;develop&#39;, &#39;develop&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital hardware&#39;, &#39;digital systems&#39;, &#39;digital systems&#39;, &#39;digital systems&#39;, &#39;digital systems&#39;, &#39;digital systems&#39;, &#39;digital systems&#39;, &#39;ed&#39;, &#39;ed&#39;, &#39;ed&#39;, &#39;eda&#39;, &#39;eda&#39;, &#39;eda&#39;, &#39;eda&#39;, &#39;eda&#39;, &#39;eda&#39;, &#39;eda tool&#39;, &#39;eda tool&#39;, &#39;eda tool&#39;, &#39;eda tool&#39;, &#39;eda tool&#39;, &#39;eda tool&#39;, &#39;ee&#39;, &#39;ee&#39;, &#39;ee&#39;, &#39;ee&#39;, &#39;ee&#39;, &#39;ee&#39;, &#39;efficiency&#39;, &#39;efficiency&#39;, &#39;efficiency&#39;, &#39;efficient&#39;, &#39;efficient&#39;, &#39;efficient&#39;, &#39;electronic&#39;, &#39;electronic&#39;, &#39;electronic&#39;, &#39;electronic&#39;, &#39;electronic&#39;, &#39;electronic&#39;, &#39;elements&#39;, &#39;elements&#39;, &#39;elements&#39;, &#39;elements&#39;, &#39;elements&#39;, &#39;elements&#39;, &#39;embed&#39;, &#39;embed&#39;, &#39;embed&#39;, &#39;embed&#39;, &#39;embed&#39;, &#39;embed&#39;, &#39;embed systems&#39;, &#39;embed systems&#39;, &#39;embed systems&#39;, &#39;embed systems&#39;, &#39;embed systems&#39;, &#39;embed systems&#39;, &#39;en&#39;, &#39;en&#39;, &#39;en&#39;, &#39;en bibliothèque&#39;, &#39;en bibliothèque&#39;, &#39;en bibliothèque&#39;, &#39;end student&#39;, &#39;end student&#39;, &#39;end student&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;environment&#39;, &#39;essential&#39;, &#39;essential&#39;, &#39;essential&#39;, &#39;examination&#39;, &#39;examination&#39;, &#39;examination&#39;, &#39;examination&#39;, &#39;examination&#39;, &#39;examination&#39;, &#39;examination final&#39;, &#39;examination final&#39;, &#39;examination final&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise&#39;, &#39;exercise expect&#39;, &#39;exercise expect&#39;, &#39;exercise expect&#39;, &#39;expect&#39;, &#39;expect&#39;, &#39;expect&#39;, &#39;expect student&#39;, &#39;expect student&#39;, &#39;expect student&#39;, &#39;feature&#39;, &#39;feature&#39;, &#39;feature&#39;, &#39;feedback&#39;, &#39;feedback&#39;, &#39;feedback&#39;, &#39;final&#39;, &#39;final&#39;, &#39;final&#39;, &#39;final examination&#39;, &#39;final examination&#39;, &#39;final examination&#39;, &#39;formalisms&#39;, &#39;formalisms&#39;, &#39;formalisms&#39;, &#39;forum&#39;, &#39;forum&#39;, &#39;forum&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;functional verification&#39;, &#39;fundamental&#39;, &#39;fundamental&#39;, &#39;fundamental&#39;, &#39;guide&#39;, &#39;guide&#39;, &#39;guide&#39;, &#39;guide&#39;, &#39;guide&#39;, &#39;guide&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware&#39;, &#39;hardware description&#39;, &#39;hardware description&#39;, &#39;hardware description&#39;, &#39;hardware description&#39;, &#39;hardware description&#39;, &#39;hardware description&#39;, &#39;hardware model&#39;, &#39;hardware model&#39;, &#39;hardware model&#39;, &#39;homework&#39;, &#39;homework&#39;, &#39;homework&#39;, &#39;homework exercise&#39;, &#39;homework exercise&#39;, &#39;homework exercise&#39;, &#39;hours&#39;, &#39;hours&#39;, &#39;hours&#39;, &#39;hours assistants&#39;, &#39;hours assistants&#39;, &#39;hours assistants&#39;, &#39;httpmoodleepflchcourseviewphpid&#39;, &#39;httpmoodleepflchcourseviewphpid&#39;, &#39;httpmoodleepflchcourseviewphpid&#39;, &#39;important&#39;, &#39;important&#39;, &#39;important&#39;, &#39;important concepts&#39;, &#39;important concepts&#39;, &#39;important concepts&#39;, &#39;include&#39;, &#39;include&#39;, &#39;include&#39;, &#39;individual&#39;, &#39;individual&#39;, &#39;individual&#39;, &#39;integrate&#39;, &#39;integrate&#39;, &#39;integrate&#39;, &#39;integrate exercise&#39;, &#39;integrate exercise&#39;, &#39;integrate exercise&#39;, &#39;introduce&#39;, &#39;introduce&#39;, &#39;introduce&#39;, &#39;introduction&#39;, &#39;introduction&#39;, &#39;introduction&#39;, &#39;issue&#39;, &#39;issue&#39;, &#39;issue&#39;, &#39;keywords&#39;, &#39;keywords&#39;, &#39;keywords&#39;, &#39;lab&#39;, &#39;lab&#39;, &#39;lab&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;language&#39;, &#39;languages&#39;, &#39;languages&#39;, &#39;languages&#39;, &#39;languages&#39;, &#39;languages&#39;, &#39;languages&#39;, &#39;layer&#39;, &#39;layer&#39;, &#39;layer&#39;, &#39;learn outcomes&#39;, &#39;learn outcomes&#39;, &#39;learn outcomes&#39;, &#39;learn prerequisites&#39;, &#39;learn prerequisites&#39;, &#39;learn prerequisites&#39;, &#39;lecture complete&#39;, &#39;lecture complete&#39;, &#39;lecture complete&#39;, &#39;lecture integrate&#39;, &#39;lecture integrate&#39;, &#39;lecture integrate&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;level&#39;, &#39;link&#39;, &#39;link&#39;, &#39;link&#39;, &#39;link httpmoodleepflchcourseviewphpid&#39;, &#39;link httpmoodleepflchcourseviewphpid&#39;, &#39;link httpmoodleepflchcourseviewphpid&#39;, &#39;logic&#39;, &#39;logic&#39;, &#39;logic&#39;, &#39;logic systems&#39;, &#39;logic systems&#39;, &#39;logic systems&#39;, &#39;methodologies&#39;, &#39;methodologies&#39;, &#39;methodologies&#39;, &#39;methodologies&#39;, &#39;methodologies&#39;, &#39;methodologies&#39;, &#39;methodology&#39;, &#39;methodology&#39;, &#39;methodology&#39;, &#39;methods homework&#39;, &#39;methods homework&#39;, &#39;methods homework&#39;, &#39;methods lecture&#39;, &#39;methods lecture&#39;, &#39;methods lecture&#39;, &#39;midterm&#39;, &#39;midterm&#39;, &#39;midterm&#39;, &#39;midterm examination&#39;, &#39;midterm examination&#39;, &#39;midterm examination&#39;, &#39;model concepts&#39;, &#39;model concepts&#39;, &#39;model concepts&#39;, &#39;model digital&#39;, &#39;model digital&#39;, &#39;model digital&#39;, &#39;model formalisms&#39;, &#39;model formalisms&#39;, &#39;model formalisms&#39;, &#39;model level&#39;, &#39;model level&#39;, &#39;model level&#39;, &#39;model model&#39;, &#39;model model&#39;, &#39;model model&#39;, &#39;modern&#39;, &#39;modern&#39;, &#39;modern&#39;, &#39;moodle&#39;, &#39;moodle&#39;, &#39;moodle&#39;, &#39;moodle&#39;, &#39;moodle&#39;, &#39;moodle&#39;, &#39;moodle link&#39;, &#39;moodle link&#39;, &#39;moodle link&#39;, &#39;moodle page&#39;, &#39;moodle page&#39;, &#39;moodle page&#39;, &#39;note&#39;, &#39;note&#39;, &#39;note&#39;, &#39;noteshandbook&#39;, &#39;noteshandbook&#39;, &#39;noteshandbook&#39;, &#39;notion&#39;, &#39;notion&#39;, &#39;notion&#39;, &#39;office&#39;, &#39;office&#39;, &#39;office&#39;, &#39;office hours&#39;, &#39;office hours&#39;, &#39;office hours&#39;, &#39;open&#39;, &#39;open&#39;, &#39;open&#39;, &#39;outcomes&#39;, &#39;outcomes&#39;, &#39;outcomes&#39;, &#39;outcomes end&#39;, &#39;outcomes end&#39;, &#39;outcomes end&#39;, &#39;page&#39;, &#39;page&#39;, &#39;page&#39;, &#39;plan&#39;, &#39;plan&#39;, &#39;plan&#39;, &#39;prerequisites&#39;, &#39;prerequisites&#39;, &#39;prerequisites&#39;, &#39;prerequisites require&#39;, &#39;prerequisites require&#39;, &#39;prerequisites require&#39;, &#39;principles&#39;, &#39;principles&#39;, &#39;principles&#39;, &#39;problems&#39;, &#39;problems&#39;, &#39;problems&#39;, &#39;proper&#39;, &#39;proper&#39;, &#39;proper&#39;, &#39;proper&#39;, &#39;proper&#39;, &#39;proper&#39;, &#39;quiz&#39;, &#39;quiz&#39;, &#39;quiz&#39;, &#39;recommend&#39;, &#39;recommend&#39;, &#39;recommend&#39;, &#39;recommend course&#39;, &#39;recommend course&#39;, &#39;recommend course&#39;, &#39;require&#39;, &#39;require&#39;, &#39;require&#39;, &#39;require&#39;, &#39;require&#39;, &#39;require&#39;, &#39;require course&#39;, &#39;require course&#39;, &#39;require course&#39;, &#39;resources&#39;, &#39;resources&#39;, &#39;resources&#39;, &#39;resources bibliography&#39;, &#39;resources bibliography&#39;, &#39;resources bibliography&#39;, &#39;ressources&#39;, &#39;ressources&#39;, &#39;ressources&#39;, &#39;ressources en&#39;, &#39;ressources en&#39;, &#39;ressources en&#39;, &#39;reusable&#39;, &#39;reusable&#39;, &#39;reusable&#39;, &#39;review&#39;, &#39;review&#39;, &#39;review&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;rtl&#39;, &#39;sequential&#39;, &#39;sequential&#39;, &#39;sequential&#39;, &#39;soc&#39;, &#39;soc&#39;, &#39;soc&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;socs&#39;, &#39;source&#39;, &#39;source&#39;, &#39;source&#39;, &#39;springer&#39;, &#39;springer&#39;, &#39;springer&#39;, &#39;springer&#39;, &#39;springer&#39;, &#39;springer&#39;, &#39;start&#39;, &#39;start&#39;, &#39;start&#39;, &#39;stateoftheart&#39;, &#39;stateoftheart&#39;, &#39;stateoftheart&#39;, &#39;student activities&#39;, &#39;student activities&#39;, &#39;student activities&#39;, &#39;student describe&#39;, &#39;student describe&#39;, &#39;student describe&#39;, &#39;supervision&#39;, &#39;supervision&#39;, &#39;supervision&#39;, &#39;supervision office&#39;, &#39;supervision office&#39;, &#39;supervision office&#39;, &#39;synthesis&#39;, &#39;synthesis&#39;, &#39;synthesis&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system&#39;, &#39;system design&#39;, &#39;system design&#39;, &#39;system design&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;system level&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systemc&#39;, &#39;systems cs&#39;, &#39;systems cs&#39;, &#39;systems cs&#39;, &#39;systems design&#39;, &#39;systems design&#39;, &#39;systems design&#39;, &#39;systems design&#39;, &#39;systems design&#39;, &#39;systems design&#39;, &#39;systemsonchip&#39;, &#39;systemsonchip&#39;, &#39;systemsonchip&#39;, &#39;systemsonchip&#39;, &#39;systemsonchip&#39;, &#39;systemsonchip&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;systemverilog systemc&#39;, &#39;task&#39;, &#39;task&#39;, &#39;task&#39;, &#39;teach&#39;, &#39;teach&#39;, &#39;teach&#39;, &#39;teach methods&#39;, &#39;teach methods&#39;, &#39;teach methods&#39;, &#39;techniquesdevelop&#39;, &#39;techniquesdevelop&#39;, &#39;techniquesdevelop&#39;, &#39;tool&#39;, &#39;tool&#39;, &#39;tool&#39;, &#39;tool&#39;, &#39;tool&#39;, &#39;tool&#39;, &#39;users&#39;, &#39;users&#39;, &#39;users&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;verification&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;vhdl&#39;, &#39;websites&#39;, &#39;websites&#39;, &#39;websites&#39;, &#39;work&#39;, &#39;work&#39;, &#39;work&#39;]
+<pre>LARGEST 20 EIGENVALUES:
+[ 61.4911109   41.11869589  38.06116804  36.89655454  35.64803951
+  34.57357261  33.17108239  32.71968738  32.20601846  31.4253953
+  31.10123689  30.36687001  29.97372375  29.73694418  28.73211126
+  28.65421312  28.46731951  28.27977773  28.22180541  27.95464965]
 </pre>
 </div>
 </div>
@@ -11990,7 +11903,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Exercise-4.2:-Term-document-matrix">Exercise 4.2: Term-document matrix<a class="anchor-link" href="#Exercise-4.2:-Term-document-matrix">&#182;</a></h2>
+<h2 id="Exercise-4.5:-Topic-extraction">Exercise 4.5: Topic extraction<a class="anchor-link" href="#Exercise-4.5:-Topic-extraction">&#182;</a></h2>
 </div>
 </div>
 </div>
@@ -11999,7 +11912,392 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Construct-an-M&#215;N-term-document-matrix-X,-where-M-is-the-number-of-terms-and-N-is-the-number-of-documents.-The-matrix-X-should-be-sparse.-You-are-not-allowed-to-use-libraries-for-this-task.">Construct an M&#215;N term-document matrix X, where M is the number of terms and N is the number of documents. The matrix X should be sparse. You are not allowed to use libraries for this task.<a class="anchor-link" href="#Construct-an-M&#215;N-term-document-matrix-X,-where-M-is-the-number-of-terms-and-N-is-the-number-of-documents.-The-matrix-X-should-be-sparse.-You-are-not-allowed-to-use-libraries-for-this-task.">&#182;</a></h3>
+<h3 id="Extract-the-topics-from-the-term-document-matrix-X-using-the-low-rank-approximation.">Extract the topics from the term-document matrix X using the low-rank approximation.<a class="anchor-link" href="#Extract-the-topics-from-the-term-document-matrix-X-using-the-low-rank-approximation.">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[5]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># extract the topics, containing their eigenvalue,</span>
+<span class="c1"># as well as the lists containing the weights of</span>
+<span class="c1"># the terms and courses within this topic respectively</span>
+<span class="n">topics</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="c1"># note: this array is computet inversly over S,</span>
+<span class="c1"># therefore the eigenvalues will be sorted</span>
+<span class="c1"># from largest to smallest</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">K</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">):</span>
+    <span class="n">topics</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">S</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">U</span><span class="o">.</span><span class="n">T</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">VT</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Print-the-top-10-topics-as-a-combination-of-terms-and-a-combination-of-documents.">Print the top-10 topics as a combination of terms and a combination of documents.<a class="anchor-link" href="#Print-the-top-10-topics-as-a-combination-of-terms-and-a-combination-of-documents.">&#182;</a></h3><p>For this, we will print the top 10 terms and decuments respectively of the top-10 topics</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[6]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># the first 10 terms will be the top 10</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+    <span class="n">curr</span> <span class="o">=</span> <span class="n">topics</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    
+    <span class="c1"># title of each topic with it eigenvalue</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;topic:&quot;</span><span class="p">,</span> <span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;( eigenvalue:&quot;</span><span class="p">,</span> <span class="n">curr</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="s2">&quot;)&quot;</span><span class="p">)</span>
+    
+    <span class="c1"># print the top 10 terms within that topic</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  top10 terms:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">curr</span><span class="p">[</span><span class="mi">1</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   &quot;</span><span class="p">,</span> <span class="n">curr</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="n">t</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">words</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+    
+    <span class="c1"># print the top 10 courses within that topic</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;  top10 courses:&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">curr</span><span class="p">[</span><span class="mi">2</span><span class="p">])[:</span><span class="mi">10</span><span class="p">]:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;   &quot;</span><span class="p">,</span> <span class="n">curr</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="n">t</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">courses</span><span class="p">[</span><span class="n">t</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>topic: 1 ( eigenvalue: 61.4911108973 )
+  top10 terms:
+    0.108270211004 : project
+    0.0816817895981 : data
+    0.0756358641883 : report
+    0.0755159062971 : materials
+    0.0726962641445 : research
+    0.0726730141339 : work
+    0.0705602992579 : engineer
+    0.0701417892484 : basic
+    0.0681158492668 : study
+    0.0676815304476 : theory
+  top10 courses:
+    0.110097689162 : ChE-437
+    0.105206639795 : CH-413
+    0.10155141235 : PENS-210
+    0.0980084587656 : BIO-487
+    0.0850466515802 : PHYS-106(en)
+    0.0806883548355 : MATH-468
+    0.0801779660628 : ChE-311
+    0.0788014289508 : BIO-105
+    0.0780009478045 : ME-475
+    0.0779429329881 : CH-492
+
+topic: 2 ( eigenvalue: 41.1186958882 )
+  top10 terms:
+    0.0500541127238 : financial
+    0.0439373949129 : price
+    0.0412431684583 : finance
+    0.0380250945786 : linear
+    0.0348625575018 : numerical
+    0.0337247795024 : probability
+    0.0332250663039 : stochastic
+    0.0329423109591 : algorithms
+    0.0312462318759 : optimization
+    0.0308988798617 : market
+  top10 courses:
+    0.0675201020444 : MGT-482
+    0.0569212153697 : FIN-401
+    0.0512010423164 : FIN-402
+    0.0477741962156 : FIN-404
+    0.0426836065424 : FIN-606
+    0.0400843683843 : MATH-468
+    0.0399923572705 : MATH-472
+    0.0399258504739 : MATH-461
+    0.0398848640723 : FIN-407
+    0.0377470770597 : FIN-601
+
+topic: 3 ( eigenvalue: 38.0611680444 )
+  top10 terms:
+    0.106730387002 : financial
+    0.0966803732202 : project
+    0.091928813975 : finance
+    0.0856938651662 : price
+    0.0719275107065 : data
+    0.0698945736112 : market
+    0.0697071786073 : edms
+    0.0692962703835 : doctoral students
+    0.0677053077485 : risk
+    0.0645081854468 : corporate
+  top10 courses:
+    0.150582221333 : MGT-482
+    0.135747786852 : FIN-401
+    0.0933332670041 : FIN-601
+    0.0892536044903 : PENS-210
+    0.0854377904687 : MGT-414
+    0.0821222702367 : BIO-676
+    0.0813255290304 : FIN-404
+    0.0807169739816 : FIN-402
+    0.0756164985809 : FIN-405
+    0.0730100873483 : BIOENG-489
+
+topic: 4 ( eigenvalue: 36.8965545398 )
+  top10 terms:
+    0.128087125299 : stochastic
+    0.118643682486 : linear
+    0.105563428294 : probability
+    0.104367800757 : financial
+    0.103154037769 : price
+    0.0976205503991 : numerical
+    0.0914713342195 : algorithms
+    0.0893401447213 : equations
+    0.0836947474296 : finance
+    0.0778824251533 : optimization
+  top10 courses:
+    0.132453348676 : FIN-402
+    0.131844655535 : CS-435
+    0.12754761891 : FIN-606
+    0.112122155762 : MATH-472
+    0.112105866112 : FIN-404
+    0.111214899128 : MATH-457
+    0.103672721161 : MATH-468
+    0.102822184114 : FIN-408
+    0.101012011066 : PHYS-403
+    0.0984482139248 : MATH-470
+
+topic: 5 ( eigenvalue: 35.6480395106 )
+  top10 terms:
+    0.0698119803802 : energy
+    0.0694137701675 : heat
+    0.064892159413 : kinetics
+    0.0541399667309 : transport
+    0.0532242546345 : cell
+    0.0519557980049 : bioprocess
+    0.0519220829465 : chemistry
+    0.0513343279753 : fluid
+    0.0505750972215 : molecular
+    0.0503962918534 : properties
+  top10 courses:
+    0.143066640875 : ChE-437
+    0.125181505742 : ChE-311
+    0.0894383425496 : PHYS-106(en)
+    0.0823915866587 : CH-492
+    0.0777527612289 : ENV-715
+    0.0681925305756 : CH-447
+    0.0634197497978 : ChE-403
+    0.0623873552183 : MICRO-566
+    0.0602891657395 : ME-551
+    0.0602669056204 : CH-311
+
+topic: 6 ( eigenvalue: 34.5735726083 )
+  top10 terms:
+    0.190858390777 : financial
+    0.162241210614 : finance
+    0.158495840277 : price
+    0.141769310602 : risk
+    0.122897124633 : corporate finance
+    0.119805147624 : corporate
+    0.119700530644 : market
+    0.115824837807 : valuation
+    0.110988016814 : asset
+    0.098255090962 : derivatives
+  top10 courses:
+    0.273463915067 : MGT-482
+    0.262382476876 : FIN-401
+    0.183513075696 : ChE-437
+    0.181862727218 : FIN-601
+    0.169053144145 : FIN-609
+    0.153398977288 : FIN-405
+    0.152106698868 : ChE-311
+    0.13768979447 : FIN-404
+    0.120188784386 : FIN-402
+    0.117325344894 : CH-413
+
+topic: 7 ( eigenvalue: 33.1710823943 )
+  top10 terms:
+    0.130903331544 : drug
+    0.106516451147 : molecular
+    0.097321484372 : protein
+    0.0864758589957 : dna
+    0.082522601256 : pharmacology
+    0.0706904067211 : biophysical
+    0.0696582308122 : scientific
+    0.0689146950977 : literature
+    0.0686659014941 : disease
+    0.0683997929591 : medicine
+  top10 courses:
+    0.268037763209 : BIO-487
+    0.219823042268 : CH-413
+    0.142164351636 : CH-311
+    0.126132934906 : BIO-502
+    0.125091122123 : BIO-503
+    0.124517286831 : BIOENG-489
+    0.121580064928 : BIO-501
+    0.1156797543 : BIO-506
+    0.112589189589 : BIO-507
+    0.112449992405 : BIO-504
+
+topic: 8 ( eigenvalue: 32.7196873775 )
+  top10 terms:
+    0.142099381111 : drug
+    0.119105701131 : circuit
+    0.11828195349 : optical
+    0.0906190787884 : pharmacology
+    0.0901316055198 : sensors
+    0.0830779978627 : signal
+    0.0828836494632 : devices
+    0.0807152019184 : disease
+    0.0789168449527 : nanobiotechnological
+    0.0757136319381 : digital
+  top10 courses:
+    0.293149252662 : BIO-487
+    0.265158146671 : CH-413
+    0.115564355377 : BIO-494
+    0.105338770275 : BIOENG-445
+    0.0846387428955 : CH-448
+    0.0813418703041 : EE-613
+    0.0804972247005 : EE-606
+    0.0799174169516 : MICRO-611
+    0.0790278162066 : MICRO-432
+    0.0787783019575 : EE-535
+
+topic: 9 ( eigenvalue: 32.2060184601 )
+  top10 terms:
+    0.122282541569 : bioprocess
+    0.115090796115 : studio
+    0.11257377689 : architectural
+    0.0918770367891 : downstream
+    0.0895116824395 : kinetics
+    0.0888950540747 : urban
+    0.0821953670987 : drug
+    0.0761474385294 : pharmacology
+    0.0736102323285 : adsorption
+    0.0702385756444 : precipitation
+  top10 courses:
+    0.31608118452 : ChE-437
+    0.260719932098 : ChE-311
+    0.24760707938 : BIO-487
+    0.210267385979 : AR-401(y)
+    0.208053470363 : AR-402(y)
+    0.0939572296783 : MSE-636(a)
+    0.0939572296783 : MSE-636(b)
+    0.093577993953 : AR-402(b)
+    0.0926124918518 : BIO-494
+    0.0905997582738 : AR-401(b)
+
+topic: 10 ( eigenvalue: 31.4253953036 )
+  top10 terms:
+    0.163977907935 : circuit
+    0.126138173418 : bioprocess
+    0.0931919566056 : downstream
+    0.0891609371358 : analog
+    0.083005912337 : kinetics
+    0.078734390571 : signal
+    0.0778353756392 : integrate
+    0.076289337537 : adsorption
+    0.0686623119969 : bioreactors
+    0.0685132656056 : dsp
+  top10 courses:
+    0.318308890238 : ChE-437
+    0.252292662297 : ChE-311
+    0.157900010536 : PHYS-458
+    0.129178210316 : PHYS-459
+    0.126475019246 : EE-429
+    0.106517551425 : BIO-487
+    0.0893295429888 : EE-421
+    0.0887516905123 : EE-434
+    0.0852788547764 : MICRO-704
+    0.083342570027 : MICRO-432
+
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Give-a-label-to-each-of-them.">Give a label to each of them.<a class="anchor-link" href="#Give-a-label-to-each-of-them.">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p><strong>topic 1: semester project</strong> <br>
+project, data, report, materials, research, work, engineer, basic, study, theory</p>
+<p><strong>topic 2: finance analysis</strong> <br>
+financial, price, finance, linear, numerical, probability, stochastic, algorithms, optimization, market</p>
+<p><strong>topic 3: financial market</strong> <br>
+financial, project, finance, price, data, market, edms, doctoral students, risk, corporate</p>
+<p><strong>topic 4: probabilistic finance analysis</strong> <br>
+stochastic, linear, probability, financial, price, numerical, algorithms, equations, finance, optimization</p>
+<p><strong>topic 5: body physics</strong> <br>
+energy, heat, kinetics, transport, cell, bioprocess, chemistry, fluid, molecular, properties</p>
+<p><strong>topic 6: corproate finances</strong> <br>
+financial, finance, price, risk, corporate finance, corporate, market, valuation, asset, derivatives</p>
+<p><strong>topic 7: pharmacology</strong> <br>
+drug, molecular, protein, dna, pharmacology, biophysical, scientific, literature, disease, medicine</p>
+<p><strong>topic 8: sensorial pharmacology</strong> <br>
+drug, circuit, optical, pharmacology, sensors, signal, devices, disease, nanobiotechnological, digital</p>
+<p><strong>topic 9: biokinetics</strong> <br>
+bioprocess, studio, architectural, downstream, kinetics, urban, drug, pharmacology, adsorption, precipitation</p>
+<p><strong>topic 10: reactionary bioprocesses</strong> <br>
+circuit, bioprocess, downstream, analog, kinetics, signal, integrate, adsorption, bioreactors, dsp</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exercise-4.6:-Document-similarity-search-in-concept-space">Exercise 4.6: Document similarity search in concept-space<a class="anchor-link" href="#Exercise-4.6:-Document-similarity-search-in-concept-space">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># document similarity given the document&#39;s and term&#39;s index</span>
+<span class="k">def</span> <span class="nf">docsim</span><span class="p">(</span><span class="n">t</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">t</span><span class="p">],</span> <span class="n">S</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">U</span><span class="p">[</span><span class="n">t</span><span class="p">])</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">S</span><span class="o">*</span><span class="n">V</span><span class="p">[</span><span class="n">d</span><span class="p">])</span> <span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Implement-a-search-function-using-LSI-concept-space.">Implement a search function using LSI concept-space.<a class="anchor-link" href="#Implement-a-search-function-using-LSI-concept-space.">&#182;</a></h3>
 </div>
 </div>
 </div>
@@ -12008,16 +12306,10 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[8]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct mappings to retrieve a term from its index</span>
-<span class="c1"># as well as an index given a term</span>
-<span class="n">words_index</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">words_list</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">words_filtered</span><span class="p">:</span>
-    <span class="n">words_index</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="n">words_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># load the dictionaries to return the indexes</span>
+<span class="c1"># of terms / courses from their name</span>
+<span class="n">words_dict</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/words_dict.npy&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
+<span class="n">courses_dict</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="s2">&quot;data/courses_dict.npy&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">item</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12025,21 +12317,45 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Search-for-&quot;facebook&quot;-in-both-VSM-and-LSI.-How-does-it-compare?-Why?">Search for "facebook" in both VSM and LSI. How does it compare? Why?<a class="anchor-link" href="#Search-for-&quot;facebook&quot;-in-both-VSM-and-LSI.-How-does-it-compare?-Why?">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>As before, the term "facebook" does not exist in the filtered list of terms.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Search-for-&quot;markov-chains&quot;-and-compare-with-the-previous-section.">Search for "markov chains" and compare with the previous section.<a class="anchor-link" href="#Search-for-&quot;markov-chains&quot;-and-compare-with-the-previous-section.">&#182;</a></h3>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[9]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct mappings to retrieve a courseId from its index</span>
-<span class="c1"># as well as an index given a courseId</span>
-<span class="n">courses_index</span> <span class="o">=</span> <span class="p">{}</span>
-<span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
-<span class="n">courses_list</span> <span class="o">=</span> <span class="p">[]</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># compute the docsim of each course with the term &#39;markov chain&#39;</span>
+<span class="n">markov_index</span> <span class="o">=</span> <span class="n">words_dict</span><span class="p">[</span><span class="s1">&#39;markov chain&#39;</span><span class="p">]</span>
+<span class="n">markov_sim</span> <span class="o">=</span> <span class="p">[]</span>
 
-<span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">courses_proc2</span><span class="p">:</span>
-    <span class="n">courses_index</span><span class="p">[</span><span class="n">w</span><span class="p">]</span> <span class="o">=</span> <span class="n">i</span>
-    <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="n">courses_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+    <span class="n">markov_sim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">docsim</span><span class="p">(</span><span class="n">markov_index</span><span class="p">,</span> <span class="n">i</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12052,28 +12368,109 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[10]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># parameters required for constructing the matrix</span>
-<span class="n">M</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">words_index</span><span class="p">)</span>
-<span class="n">N</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">courses_index</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># find and print the best 10 similarity scores</span>
+<span class="n">LSI_markov_top10</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">markov_sim</span><span class="p">))[:</span><span class="mi">10</span><span class="p">]</span>
+<span class="n">top_markov_names</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TOP 10 COURSES FOR &#39;MARKOV CHAIN&#39;&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">LSI_markov_top10</span><span class="p">:</span>
+    <span class="n">top_markov_names</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">courses</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">markov_sim</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">courses</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 
 </div>
 </div>
 </div>
 
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>TOP 10 COURSES FOR &#39;MARKOV CHAIN&#39;
+  0.857005393917 : MATH-332
+  0.767029694205 : COM-516
+  0.725089702301 : MGT-484
+  0.304445132341 : MATH-600
+  0.268045333444 : COM-512
+  0.209648482257 : FIN-408
+  0.173026424099 : COM-308
+  0.148197356075 : COM-417
+  0.130716391711 : FIN-409
+  0.119442811712 : EE-554
+</pre>
+</div>
+</div>
+
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<table>
+<thead><tr>
+<th style="text-align:right"></th>
+<th style="text-align:center">top 1</th>
+<th style="text-align:center">top 2</th>
+<th style="text-align:center">top 3</th>
+<th style="text-align:center">top 4</th>
+<th style="text-align:center">top 5</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:right"><strong>VSM</strong></td>
+<td style="text-align:center">MATH-332</td>
+<td style="text-align:center">COM-516</td>
+<td style="text-align:center">MGT-484</td>
+<td style="text-align:center">FIN-408</td>
+<td style="text-align:center">COM-308</td>
+</tr>
+<tr>
+<td style="text-align:right"><strong>LSI</strong></td>
+<td style="text-align:center">MATH-332</td>
+<td style="text-align:center">COM-516</td>
+<td style="text-align:center">MGT-484</td>
+<td style="text-align:center">MATH-600</td>
+<td style="text-align:center">COM-512</td>
+</tr>
+</tbody>
+</table>
+<p>The first three courses are identical, the last two courses are different, but they are still from the same sections (namely mathematics "MATH" and communication systems "COM"). However, the top 4-5 courses from VSM are the top 6-7 courses in LSI, so they are still similarly placed.</p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h2 id="Exercise-4.7:-Document-document-similarity">Exercise 4.7: Document-document similarity<a class="anchor-link" href="#Exercise-4.7:-Document-document-similarity">&#182;</a></h2>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Find-the-classes-that-are-the-most-similar-to-Internet-Analytics.">Find the classes that are the most similar to Internet Analytics.<a class="anchor-link" href="#Find-the-classes-that-are-the-most-similar-to-Internet-Analytics.">&#182;</a></h3>
+</div>
+</div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[11]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># matrix containing how many times each words</span>
-<span class="c1"># appears in each document</span>
-<span class="n">X</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">((</span><span class="n">M</span><span class="p">,</span> <span class="n">N</span><span class="p">))</span>
-
-<span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">courses_proc2</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">courses_proc2</span><span class="p">[</span><span class="n">c</span><span class="p">]:</span>
-        <span class="n">X</span><span class="p">[</span><span class="n">words_index</span><span class="p">[</span><span class="n">t</span><span class="p">]][</span><span class="n">courses_index</span><span class="p">[</span><span class="n">c</span><span class="p">]]</span> <span class="o">+=</span> <span class="mi">1</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># index of the internet analytics course</span>
+<span class="n">ia_index</span> <span class="o">=</span> <span class="n">courses_dict</span><span class="p">[</span><span class="s1">&#39;COM-308&#39;</span><span class="p">]</span>
 </pre></div>
 
 </div>
@@ -12086,7 +12483,8 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Print-the-15-terms-in-the-description-of-the-$9^{th}$-class-with-the-highest-TF-IDF-scores.">Print the 15 terms in the description of the $9^{th}$ class with the highest TF-IDF scores.<a class="anchor-link" href="#Print-the-15-terms-in-the-description-of-the-$9^{th}$-class-with-the-highest-TF-IDF-scores.">&#182;</a></h3><p>The TFIDF matrix is constructed transposed, to allow for easier access to the courses, since these are mainly accessed in these exercises.</p>
+<h3 id="Write-down-the-equation-to-efficiently-compute-the-similarity-between-documents.">Write down the equation to efficiently compute the similarity between documents.<a class="anchor-link" href="#Write-down-the-equation-to-efficiently-compute-the-similarity-between-documents.">&#182;</a></h3><p>Since the topic distribution of a document is entirely stored in V, we only have to compare the right singular vectors of X, or the rows of V.</p>
+<p>Other than that, cosine similarity can be used between the vectors, as it is very efficient.</p>
 
 </div>
 </div>
@@ -12096,10 +12494,11 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[12]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct the TF matrix, containing the</span>
-<span class="c1"># normalized entries in X by the maximum of</span>
-<span class="c1"># the respective row</span>
-<span class="n">TF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="o">/</span> <span class="n">x</span><span class="o">.</span><span class="n">max</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">X</span><span class="o">.</span><span class="n">T</span><span class="p">])</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># similarity between two courses given their indexes</span>
+<span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
+    <span class="n">di</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+    <span class="n">dj</span> <span class="o">=</span> <span class="n">V</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">dj</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dj</span><span class="p">)</span> <span class="p">)</span>
 </pre></div>
 
 </div>
@@ -12107,20 +12506,31 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="Print-the-top-5-classes-most-similar-to-COM-308.">Print the top 5 classes most similar to COM-308.<a class="anchor-link" href="#Print-the-top-5-classes-most-similar-to-COM-308.">&#182;</a></h3>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[13]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct the IDF array, containing the</span>
-<span class="c1"># frequencies of the words within the corpus</span>
-<span class="n">IDF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">(</span><span class="n">M</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">X</span><span class="p">)):</span>
-    <span class="n">count</span> <span class="o">=</span> <span class="mi">0</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">X</span><span class="p">[</span><span class="n">i</span><span class="p">]:</span>
-        <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">count</span> <span class="o">+=</span> <span class="mi">1</span>
-    <span class="n">IDF</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">log2</span><span class="p">(</span><span class="n">N</span> <span class="o">/</span> <span class="n">count</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># compute the similarity scores between</span>
+<span class="c1"># the courses and &#39;COM-308&#39;</span>
+<span class="n">ia_sim</span> <span class="o">=</span> <span class="p">[]</span>
+
+<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">V</span><span class="p">)):</span>
+    <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">ia_index</span><span class="p">:</span>
+        <span class="c1"># set the similarity of COM-308 with itself</span>
+        <span class="c1"># to -1, to avoid it being one of the best</span>
+        <span class="n">ia_sim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">ia_sim</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sim</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">ia_index</span><span class="p">))</span>
 </pre></div>
 
 </div>
@@ -12133,52 +12543,12 @@ div#notebook {
 <div class="prompt input_prompt">In&nbsp;[14]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># construct the TFIDF matrix from the</span>
-<span class="c1"># TF and IDF matrices</span>
-<span class="n">TFIDF</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">x</span> <span class="o">*</span> <span class="n">IDF</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">TF</span><span class="p">])</span>
-</pre></div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># compute the best 5 similarity scores</span>
+<span class="n">ia_sim_top5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ia_sim</span><span class="p">))[:</span><span class="mi">5</span><span class="p">]</span>
 
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[15]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># select only the row related to the 9th course</span>
-<span class="n">TFIDF_9</span> <span class="o">=</span> <span class="n">TFIDF</span><span class="p">[</span><span class="n">courses_index</span><span class="p">[</span><span class="n">courses</span><span class="p">[</span><span class="mi">9</span><span class="p">][</span><span class="s1">&#39;courseId&#39;</span><span class="p">]]]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[16]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># retrieve the 15 highest entries in TFIDF_9</span>
-<span class="n">TFIDF_9_top15</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">TFIDF_9</span><span class="p">)[:</span><span class="mi">15</span><span class="p">]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[17]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TOP 15 TERMS FROM TFIDF&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">TFIDF_9_top15</span><span class="p">:</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">TFIDF_9</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">words_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TOP 5 COURSES SIMILAR TO &#39;COM-308&#39;&quot;</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ia_sim_top5</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">ia_sim</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">courses</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
 </pre></div>
 
 </div>
@@ -12191,284 +12561,16 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>TOP 15 TERMS FROM TFIDF
-  6.03765254148 : verification
-  3.89523690385 : systemverilog
-  3.89523690385 : systemc
-  3.89523690385 : functional verification
-  3.81500253808 : vhdl
-  3.26125190356 : rtl
-  2.59682460257 : systemverilog systemc
-  2.49469492386 : hardware
-  2.3301579359 : socs
-  2.3301579359 : design vhdl
-  1.87141350903 : functional
-  1.74761845192 : digital hardware
-  1.56208089818 : digital
-  1.54761845192 : system level
-  1.08708396785 : systemsonchip
+<pre>TOP 5 COURSES SIMILAR TO &#39;COM-308&#39;
+  0.501552676399 : CS-423
+  0.394303998676 : EE-558
+  0.353265127305 : CS-401
+  0.332978132722 : EE-727
+  0.305013338653 : FIN-525
 </pre>
 </div>
 </div>
 
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Explain-where-the-difference-between-the-large-scores-and-the-small-ones-comes-from.">Explain where the difference between the large scores and the small ones comes from.<a class="anchor-link" href="#Explain-where-the-difference-between-the-large-scores-and-the-small-ones-comes-from.">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>TF gives the importance if a word in a document, between 0 and 1. 1 is the most frequent word, 0 means they never appear.</p>
-<p>IDF gives the frequency of a word in the corpus, bigger than 0. 0 means the word is in every description, infinity means it's in none of them.</p>
-<p>TFIDF then is simply the mutliplication of the two, where a high TFIDF means that word is frequent within the desctiption, but rare within the corpus.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Exercise-4.3:-Document-similarity-search">Exercise 4.3: Document similarity search<a class="anchor-link" href="#Exercise-4.3:-Document-similarity-search">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Search-for-&quot;markov-chains&quot;-and-&quot;facebook&quot;.">Search for "markov chains" and "facebook".<a class="anchor-link" href="#Search-for-&quot;markov-chains&quot;-and-&quot;facebook&quot;.">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[18]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># the word &quot;chains&quot; has been replaced by &quot;chain&quot; by lemmatization</span>
-<span class="n">markov_chain_index</span> <span class="o">=</span> <span class="n">words_index</span><span class="p">[</span><span class="s1">&#39;markov chain&#39;</span><span class="p">]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>the term "facebook" only appeeared 9 times within only one description, and was therefore filtered eaclier. thus, that term has no score and no similarity can be computed</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[19]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">words_index</span><span class="p">[</span><span class="s1">&#39;facebook&#39;</span><span class="p">]</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_text output_error">
-<pre>
-<span class="ansi-red-fg">---------------------------------------------------------------------------</span>
-<span class="ansi-red-fg">KeyError</span>                                  Traceback (most recent call last)
-<span class="ansi-green-fg">&lt;ipython-input-19-aea2ef02685d&gt;</span> in <span class="ansi-cyan-fg">&lt;module&gt;</span><span class="ansi-blue-fg">()</span>
-<span class="ansi-green-fg">----&gt; 1</span><span class="ansi-red-fg"> </span>words_index<span class="ansi-blue-fg">[</span><span class="ansi-blue-fg">&#39;facebook&#39;</span><span class="ansi-blue-fg">]</span>
-
-<span class="ansi-red-fg">KeyError</span>: &#39;facebook&#39;</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Display-the-top-five-courses-together-with-their-similarity-score-for-each-query.">Display the top five courses together with their similarity score for each query.<a class="anchor-link" href="#Display-the-top-five-courses-together-with-their-similarity-score-for-each-query.">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[20]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># cosine similarity function, given</span>
-<span class="c1"># the indeces of two courses</span>
-<span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
-    <span class="n">di</span> <span class="o">=</span> <span class="n">TFIDF</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-    <span class="n">dj</span> <span class="o">=</span> <span class="n">TFIDF</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">di</span><span class="p">,</span> <span class="n">dj</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">di</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">dj</span><span class="p">)</span> <span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[21]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># compute the scores of all courses for</span>
-<span class="c1"># the term &#39;markov chain&#39; within the TFIDF matrix</span>
-<span class="n">markov_chain_score</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">TFIDF</span><span class="p">:</span>
-    <span class="n">markov_chain_score</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="n">markov_chain_index</span><span class="p">])</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[22]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># find the 5 highest scores in markov_chain_score</span>
-<span class="n">TFIDF_markov_top5</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argsort</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">markov_chain_score</span><span class="p">))[:</span><span class="mi">5</span><span class="p">]</span>
-<span class="n">top_markov_names</span> <span class="o">=</span> <span class="p">[]</span>
-
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;TOP 5 COURSES FOR &#39;MARKOV CHAIN&#39;&quot;</span><span class="p">)</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">TFIDF_markov_top5</span><span class="p">:</span>
-    <span class="n">top_markov_names</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">i</span><span class="p">,</span> <span class="n">courses_list</span><span class="p">[</span><span class="n">i</span><span class="p">]])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">,</span> <span class="n">markov_chain_score</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="s2">&quot;:&quot;</span><span class="p">,</span> <span class="n">courses_list</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>TOP 5 COURSES FOR &#39;MARKOV CHAIN&#39;
-  5.94063200363 : MATH-332
-  4.62049155838 : COM-516
-  3.46536866878 : MGT-484
-  1.26013406138 : FIN-408
-  1.15512288959 : COM-308
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[23]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># print the similarity scores between the 5 courses</span>
-<span class="c1"># this results in a symmetric matrix with 1s on the diagonal</span>
-<span class="c1"># as the similarity score of a course with itself is 1.00</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;SIMILARITIES BETWEEN TOP 5 MARKOV CHAINS COURSES&quot;</span><span class="p">)</span>
-<span class="nb">print</span><span class="p">(</span><span class="s2">&quot;         &quot;</span><span class="p">,</span> <span class="n">top_markov_names</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_markov_names</span><span class="p">[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_markov_names</span><span class="p">[</span><span class="mi">2</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span>
-      <span class="n">top_markov_names</span><span class="p">[</span><span class="mi">3</span><span class="p">][</span><span class="mi">1</span><span class="p">],</span> <span class="n">top_markov_names</span><span class="p">[</span><span class="mi">4</span><span class="p">][</span><span class="mi">1</span><span class="p">])</span>
-<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">top_markov_names</span><span class="p">:</span>
-    <span class="n">line</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span> <span class="o">+</span> <span class="n">i</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">rjust</span><span class="p">(</span><span class="mi">8</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">top_markov_names</span><span class="p">:</span>
-        <span class="n">line</span> <span class="o">+=</span> <span class="s2">&quot;    &quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%.2f</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="nb">round</span><span class="p">(</span><span class="n">sim</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">j</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="mi">2</span><span class="p">))</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-<div class="output_wrapper">
-<div class="output">
-
-
-<div class="output_area"><div class="prompt"></div>
-<div class="output_subarea output_stream output_stdout output_text">
-<pre>SIMILARITIES BETWEEN TOP 5 MARKOV CHAINS COURSES
-          MATH-332 COM-516 MGT-484 FIN-408 COM-308
-MATH-332    1.00    0.34    0.33    0.18    0.07
- COM-516    0.34    1.00    0.32    0.21    0.10
- MGT-484    0.33    0.32    1.00    0.18    0.08
- FIN-408    0.18    0.21    0.18    1.00    0.04
- COM-308    0.07    0.10    0.08    0.04    1.00
-</pre>
-</div>
-</div>
-
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">What do you think of the results? Give your intuition on what is happening.<a class="anchor-link" href="#What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">&#182;</a></h3><p>Since all we looked for were the descriptions where "markov chain(s)" appears the most, we expected to have relatively low similartiy scores. It is likely that courses that deal with markov chains have somewhat similar topics, as it is a mathematical concept at the base, but that is not at all reqired.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h2 id="Save-all-necessary-dictionaries-and-arrays-to-disk">Save all necessary dictionaries and arrays to disk<a class="anchor-link" href="#Save-all-necessary-dictionaries-and-arrays-to-disk">&#182;</a></h2>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[24]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/TFIDF.npy&quot;</span><span class="p">,</span> <span class="n">TFIDF</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/words.npy&quot;</span><span class="p">,</span> <span class="n">words_list</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/words_dict.npy&quot;</span><span class="p">,</span> <span class="n">words_index</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/courses.npy&quot;</span><span class="p">,</span> <span class="n">courses_list</span><span class="p">)</span>
-<span class="n">np</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;data/courses_dict.npy&quot;</span><span class="p">,</span> <span class="n">courses_index</span><span class="p">)</span>
-</pre></div>
-
-</div>
 </div>
 </div>
 
