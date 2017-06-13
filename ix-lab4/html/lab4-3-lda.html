@@ -11806,42 +11806,10 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[55]:</div>
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#transform documents into bags of word</span>
-    <span class="c1">#take only the description into account</span>
-    <span class="c1">#split depending on whitespace and punctuation</span>
-    <span class="c1">#only keep letter words</span>
-    <span class="c1">#lowercase words</span>
-    <span class="c1">#remove stopwords</span>
-    <span class="c1">#remove non-relevant words</span>
-<span class="n">wordsInDocument</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[\s\.\?\!\,\;\:\-\(\)\[\]\{\}</span><span class="se">\&quot;</span><span class="s2">\/]&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()])</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">])</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span><span class="p">])</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">commonWords</span><span class="p">)])</span>
-
-
-<span class="c1">#Group words in order to obtain a word list</span>
-    <span class="c1">#add a counter</span>
-    <span class="c1">#reducebykey to group words</span>
-    <span class="c1">#descending sort on number of recurrence</span>
-<span class="n">mostReccurentWords</span> <span class="o">=</span> <span class="n">wordsInDocument</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>\
-<span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>\
-<span class="o">.</span><span class="n">sortByKey</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
-
-    
-<span class="c1"># get all possible words and map them to an id</span>
-<span class="n">wordsList</span> <span class="o">=</span> <span class="n">mostReccurentWords</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">collectAsMap</span><span class="p">()</span>
-
-<span class="n">distinctNbWords</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wordsList</span><span class="p">)</span>
-
-    
-<span class="c1"># get a document and return a tuple (id , vector of word occurrencies )</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get a document and return a tuple (id , vector of word occurrencies )</span>
 <span class="k">def</span> <span class="nf">documentToVector</span><span class="p">(</span><span class="n">d</span><span class="p">):</span>
     
     <span class="n">wordOccurrencies</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span> <span class="c1">#initialize dict</span>
@@ -11853,6 +11821,78 @@ div#notebook {
     <span class="n">wordOcc_1</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">wordOccurrencies</span><span class="p">]</span>
     
     <span class="k">return</span> <span class="p">(</span><span class="n">d</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">Vectors</span><span class="o">.</span><span class="n">sparse</span><span class="p">(</span><span class="n">distinctNbWords</span><span class="p">,</span> <span class="n">wordOcc_0</span><span class="p">,</span> <span class="n">wordOcc_1</span><span class="p">))</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[55]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Usage of pyspark LDA is highly inspired by the following: http://seanlane.net/blog/2016/PySpark_and_LDA</span>
+
+<span class="c1">#transform documents into bags of word</span>
+    <span class="c1">#take only the description into account</span>
+    <span class="c1">#split depending on whitespace and punctuation</span>
+    <span class="c1">#only keep letter words</span>
+    <span class="c1">#remove words whose length is smaller than 3</span>
+    <span class="c1">#lowercase words</span>
+    <span class="c1">#remove stopwords and  non-relevant words</span>
+<span class="n">wordsInDocument</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;description&quot;</span><span class="p">])</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;[\s\.\?\!\,\;\:\-\(\)\[\]\{\}</span><span class="se">\&quot;</span><span class="s2">\/]&quot;</span><span class="p">,</span> <span class="n">x</span><span class="p">))</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()])</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">])</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span><span class="p">])</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span><span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">stopwords</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">x</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">commonWords</span><span class="p">)])</span>
+
+
+<span class="c1">#Group words in order to obtain a word list</span>
+    <span class="c1">#add a counter</span>
+    <span class="c1">#reducebykey to group words</span>
+    <span class="c1">#descending sort on word recurrences</span>
+<span class="n">mostReccurentWords</span> <span class="o">=</span> <span class="n">wordsInDocument</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>\
+<span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>\
+<span class="o">.</span><span class="n">sortByKey</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>
+
+    
+<span class="c1"># get all possible words and map them to an id</span>
+<span class="n">wordsList</span> <span class="o">=</span> <span class="n">mostReccurentWords</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">collectAsMap</span><span class="p">()</span>
+<span class="n">distinctNbWords</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wordsList</span><span class="p">)</span>
+
+
+<span class="c1"># get correct format to submit to lda</span>
+    <span class="c1"># zipWithIndex to obtain an id for the document</span>
+    <span class="c1"># get a vector of used words</span>
+<span class="n">documents</span> <span class="o">=</span> <span class="n">wordsInDocument</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">documentToVector</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[61]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="n">wordsList_helper</span> <span class="o">=</span> <span class="n">mostReccurentWords</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">displayTopicsWords</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">,</span> <span class="n">alphaValues</span><span class="p">,</span> <span class="n">betaValues</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha = &quot;</span><span class="p">,</span><span class="n">alphaValues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s2">&quot;&amp; beta =&quot;</span><span class="p">,</span><span class="n">betaValues</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Topic &quot;</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;: &quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">lda_topics</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">wordsList_helper</span><span class="p">[</span><span class="n">w</span><span class="p">],</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -11880,22 +11920,6 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[56]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># get right format to submit to lda</span>
-    <span class="c1"># zipWithIndex to obtain an id for the document</span>
-    <span class="c1"># get a vector of used words</span>
-<span class="n">documents</span> <span class="o">=</span> <span class="n">wordsInDocument</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">documentToVector</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
 <div class="prompt input_prompt">In&nbsp;[60]:</div>
 <div class="inner_cell">
     <div class="input_area">
@@ -11904,29 +11928,6 @@ div#notebook {
 
 <span class="c1"># get topics</span>
 <span class="n">topic_indices</span> <span class="o">=</span> <span class="n">lda</span><span class="o">.</span><span class="n">describeTopics</span><span class="p">(</span><span class="n">maxTermsPerTopic</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># 10 words to display</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[61]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">wordsList_helper</span> <span class="o">=</span> <span class="n">mostReccurentWords</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-
-<span class="k">def</span> <span class="nf">displayTopicsWords</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">,</span> <span class="n">alphaValues</span><span class="p">,</span> <span class="n">betaValues</span><span class="p">):</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">)):</span>
-        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha = &quot;</span><span class="p">,</span><span class="n">alphaValues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s2">&quot;&amp; beta =&quot;</span><span class="p">,</span><span class="n">betaValues</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
-            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Topic &quot;</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;: &quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">lda_topics</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">wordsList_helper</span><span class="p">[</span><span class="n">w</span><span class="p">],</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
-            <span class="nb">print</span><span class="p">()</span>
-        <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -11979,16 +11980,16 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>alpha =  default &amp; beta = default</p>
 <ul>
-<li>financial risk : methods -models -model -stochastic -theory -time -introduction -exam -financial -risk -</li>
-<li>energy management : methods -case -energy -management -content -work -assessment -outcomes -business -evaluate -</li>
-<li>energy applications : methods -energy -equations -content -processes -transfer -applications -lecture -chemical -organic -</li>
-<li>optical microscopy : optical -optics -microscopy -imaging -epfl -electron -engineering -methods -laser -light -</li>
-<li>materials : methods -materials -content -assessment -paper -teaching -work -activities -theory -outcomes -</li>
-<li>molecular research : methods -cell -protein -molecular -flow -content -chemical -research -biology -structure -</li>
-<li>mechanics engineering : design -methods -data -analysis -structures -mechanics -materials -content -work -engineering -</li>
-<li>software project : project -plan -skills -methods -data -programming -scientific -systems -content -software -</li>
-<li>digital circuits modeling : systems -design -system -modeling -methods -circuits -processing -digital -techniques -concepts</li>
-<li>linear algorithms : models -linear -analysis -methods -control -data -algorithms -basic -statistical -statistics -</li>
+<li><strong>financial risk</strong> : methods -models -model -stochastic -theory -time -introduction -exam -financial -risk -</li>
+<li><strong>energy management</strong> : methods -case -energy -management -content -work -assessment -outcomes -business -evaluate -</li>
+<li><strong>energy applications</strong> : methods -energy -equations -content -processes -transfer -applications -lecture -chemical -organic -</li>
+<li><strong>optical microscopy</strong> : optical -optics -microscopy -imaging -epfl -electron -engineering -methods -laser -light -</li>
+<li><strong>materials theory</strong> : methods -materials -content -assessment -paper -teaching -work -activities -theory -outcomes -</li>
+<li><strong>molecular research</strong> : methods -cell -protein -molecular -flow -content -chemical -research -biology -structure -</li>
+<li><strong>mechanics engineering</strong> : design -methods -data -analysis -structures -mechanics -materials -content -work -engineering -</li>
+<li><strong>software project</strong> : project -plan -skills -methods -data -programming -scientific -systems -content -software -</li>
+<li><strong>digital circuits modeling</strong> : systems -design -system -modeling -methods -circuits -processing -digital -techniques -concepts</li>
+<li><strong>linear algorithms</strong> : models -linear -analysis -methods -control -data -algorithms -basic -statistical -statistics -</li>
 </ul>
 
 </div>
@@ -12003,18 +12004,16 @@ div#notebook {
 </div>
 </div>
 </div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
 <div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>In LSI, nearly every topic was related to either finances (containing words such as: finance, market, data, price, ...) or pharmacology (containing words such as: drug, disease, bioprocess, kinetics, ...). The only topic that was very different was based around projects, containing words as report, research and so on.</p>
+<p>In LDA the topics seem more varied, while finances, the project and biology in a broad sence are still present, there are other topics about energy, microscopy, software, circuits and similar.</p>
 
 </div>
 </div>
-</div>
-
 </div>
 <div class="cell border-box-sizing text_cell rendered">
 <div class="prompt input_prompt">
@@ -12040,8 +12039,8 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>From : <a href="https://spark.apache.org/docs/latest/mllib-clustering.html#latent-dirichlet-allocation-lda">https://spark.apache.org/docs/latest/mllib-clustering.html#latent-dirichlet-allocation-lda</a> we have the following definitions:</p>
-<p>docConcentration (alpha): Dirichlet parameter for prior over documents’ distributions over topics. Larger values encourage smoother inferred distributions.</p>
-<p>topicConcentration (beta): Dirichlet parameter for prior over topics’ distributions over terms (words). Larger values encourage smoother inferred distributions.</p>
+<p>docConcentration ($\alpha$): Dirichlet parameter for prior over documents’ distributions over topics. Larger values encourage smoother inferred distributions.</p>
+<p>topicConcentration ($\beta$): Dirichlet parameter for prior over topics’ distributions over terms (words). Larger values encourage smoother inferred distributions.</p>
 
 </div>
 </div>
@@ -12060,7 +12059,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>When the alpha parameter is really high, the documents tend to be consisted of more topics (the probability the document is part of a topic tends to be equiprobable for all topics). We can see that when alpha = 20, the topics retrieved are pretty similar. These topics are retrieved instead of others because "methods" is a top word. On the other hand, when alpah = 1.01 is used, the top retrieved topics are the really specific.</p>
+<p>When the $\alpha$ parameter is really high, the documents tend to be consisted of more topics (the probability the document is part of a topic tends to be equiprobable for all topics). We can see that when $\alpha$ = 20, the topics retrieved are pretty similar. These topics are retrieved instead of others because "methods" is a top word. On the other hand, when $\alpha$ = 1.01 is used, the top retrieved topics are the really specific.</p>
 
 </div>
 </div>
@@ -12101,7 +12100,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[63]:</div>
+<div class="prompt input_prompt">In&nbsp;[42]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="n">displayTopicsWords</span><span class="p">(</span><span class="n">lda_topics1</span><span class="p">,</span> <span class="n">alphaValues1</span><span class="p">,</span> <span class="n">betaValues1</span><span class="p">)</span>
@@ -12118,65 +12117,60 @@ div#notebook {
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
 <pre>alpha =  20.0 &amp; beta = 1.01
-- Topic  1 : methods -content -management -project -work -solid -energy -analysis -assessment -teaching -
-- Topic  2 : methods -design -content -data -project -analysis -systems -assessment -basic -outcomes -
-- Topic  3 : methods -data -content -analysis -report -project -skills -outcomes -assessment -prerequisites -
-- Topic  4 : methods -content -analysis -data -models -outcomes -control -assessment -basic -prerequisites -
-- Topic  5 : design -methods -systems -analysis -content -concepts -week -system -assessment -teaching -
-- Topic  6 : methods -risk -content -theory -basic -model -probability -introduction -assessment -concepts -
-- Topic  7 : methods -content -outcomes -concepts -energy -basic -design -prerequisites -assessment -analysis -
-- Topic  8 : methods -architecture -content -project -research -work -design -assessment -semester -teaching -
-- Topic  9 : methods -materials -systems -content -organic -devices -exercises -basic -analysis -assessment -
-- Topic  10 : methods -systems -engineering -design -analysis -content -teaching -system -assessment -data -
-
+Topic  1 : methods -content -management -project -work -solid -energy -analysis -assessment -teaching -
+Topic  2 : methods -design -content -data -project -analysis -systems -assessment -basic -outcomes -
+Topic  3 : methods -data -content -analysis -report -project -skills -outcomes -assessment -prerequisites -
+Topic  4 : methods -content -analysis -data -models -outcomes -control -assessment -basic -prerequisites -
+Topic  5 : design -methods -systems -analysis -content -concepts -week -system -assessment -teaching -
+Topic  6 : methods -risk -content -theory -basic -model -probability -introduction -assessment -concepts -
+Topic  7 : methods -content -outcomes -concepts -energy -basic -design -prerequisites -assessment -analysis -
+Topic  8 : methods -architecture -content -project -research -work -design -assessment -semester -teaching -
+Topic  9 : methods -materials -systems -content -organic -devices -exercises -basic -analysis -assessment -
+Topic  10 : methods -systems -engineering -design -analysis -content -teaching -system -assessment -data -
 alpha =  10.0 &amp; beta = 1.01
-- Topic  1 : methods -content -research -innovation -assessment -project -evaluate -activities -social -skills -
-- Topic  2 : models -methods -theory -probability -stochastic -linear -exercises -analysis -content -exam -
-- Topic  3 : systems -control -methods -system -data -power -processing -design -signal -electronics -
-- Topic  4 : design -methods -image -cell -digital -structures -week -basic -structural -analysis -
-- Topic  5 : methods -equations -flow -numerical -models -molecular -analysis -basic -problems -protein -
-- Topic  6 : data -methods -materials -risk -analysis -techniques -concepts -content -microscopy -basic -
-- Topic  7 : methods -chemistry -content -systems -organic -concepts -outcomes -prerequisites -energy -properties -
-- Topic  8 : methods -content -project -quantum -laser -work -semester -report -time -optical -
-- Topic  9 : energy -methods -optical -content -design -principles -optics -devices -assessment -systems -
-- Topic  10 : engineering -methods -project -teaching -systems -analysis -chemical -water -system -semester -
-
+Topic  1 : methods -content -research -innovation -assessment -project -evaluate -activities -social -skills -
+Topic  2 : models -methods -theory -probability -stochastic -linear -exercises -analysis -content -exam -
+Topic  3 : systems -control -methods -system -data -power -processing -design -signal -electronics -
+Topic  4 : design -methods -image -cell -digital -structures -week -basic -structural -analysis -
+Topic  5 : methods -equations -flow -numerical -models -molecular -analysis -basic -problems -protein -
+Topic  6 : data -methods -materials -risk -analysis -techniques -concepts -content -microscopy -basic -
+Topic  7 : methods -chemistry -content -systems -organic -concepts -outcomes -prerequisites -energy -properties -
+Topic  8 : methods -content -project -quantum -laser -work -semester -report -time -optical -
+Topic  9 : energy -methods -optical -content -design -principles -optics -devices -assessment -systems -
+Topic  10 : engineering -methods -project -teaching -systems -analysis -chemical -water -system -semester -
 alpha =  6.0 &amp; beta = 1.01
-- Topic  1 : methods -data -content -exercises -assessment -microscopy -skills -design -oral -basic -
-- Topic  2 : chemistry -methods -chemical -organic -processes -applications -content -materials -reactions -modeling -
-- Topic  3 : project -skills -plan -report -research -work -methods -data -scientific -based -
-- Topic  4 : models -biology -methods -model -protein -paper -cell -molecular -content -exam -
-- Topic  5 : methods -linear -analysis -theory -algorithms -processing -models -data -basic -optimization -
-- Topic  6 : energy -materials -properties -power -physics -heat -phase -magnetic -transfer -equations -
-- Topic  7 : design -methods -system -control -innovation -content -teaching -business -assessment -research -
-- Topic  8 : systems -engineering -design -methods -exercises -content -lectures -expected -system -class -
-- Topic  9 : methods -optical -quantum -risk -theory -laser -basic -optics -content -introduction -
-- Topic  10 : design -methods -content -stability -week -digital -assessment -final -note -activities -
-
+Topic  1 : methods -data -content -exercises -assessment -microscopy -skills -design -oral -basic -
+Topic  2 : chemistry -methods -chemical -organic -processes -applications -content -materials -reactions -modeling -
+Topic  3 : project -skills -plan -report -research -work -methods -data -scientific -based -
+Topic  4 : models -biology -methods -model -protein -paper -cell -molecular -content -exam -
+Topic  5 : methods -linear -analysis -theory -algorithms -processing -models -data -basic -optimization -
+Topic  6 : energy -materials -properties -power -physics -heat -phase -magnetic -transfer -equations -
+Topic  7 : design -methods -system -control -innovation -content -teaching -business -assessment -research -
+Topic  8 : systems -engineering -design -methods -exercises -content -lectures -expected -system -class -
+Topic  9 : methods -optical -quantum -risk -theory -laser -basic -optics -content -introduction -
+Topic  10 : design -methods -content -stability -week -digital -assessment -final -note -activities -
 alpha =  3.0 &amp; beta = 1.01
-- Topic  1 : methods -exam -assessment -work -theory -models -class -model -content -teaching -
-- Topic  2 : chemical -chemistry -methods -processes -materials -magnetic -water -reactions -basic -content -
-- Topic  3 : models -methods -analysis -linear -numerical -basic -concepts -exercises -equations -model -
-- Topic  4 : methods -data -systems -algorithms -optimization -control -problems -analysis -system -design -
-- Topic  5 : quantum -optical -materials -applications -content -methods -devices -mechanical -laser -design -
-- Topic  6 : design -methods -teaching -development -work -group -research -project -content -skills -
-- Topic  7 : energy -systems -design -methods -materials -concepts -heat -content -conversion -techniques -
-- Topic  8 : methods -microscopy -optics -electron -content -imaging -optical -principles -mass -field -
-- Topic  9 : scientific -biology -skills -information -project -methods -report -content -analysis -assessment -
-- Topic  10 : project -semester -data -management -risk -engineering -research -systems -design -plan -
-
+Topic  1 : methods -exam -assessment -work -theory -models -class -model -content -teaching -
+Topic  2 : chemical -chemistry -methods -processes -materials -magnetic -water -reactions -basic -content -
+Topic  3 : models -methods -analysis -linear -numerical -basic -concepts -exercises -equations -model -
+Topic  4 : methods -data -systems -algorithms -optimization -control -problems -analysis -system -design -
+Topic  5 : quantum -optical -materials -applications -content -methods -devices -mechanical -laser -design -
+Topic  6 : design -methods -teaching -development -work -group -research -project -content -skills -
+Topic  7 : energy -systems -design -methods -materials -concepts -heat -content -conversion -techniques -
+Topic  8 : methods -microscopy -optics -electron -content -imaging -optical -principles -mass -field -
+Topic  9 : scientific -biology -skills -information -project -methods -report -content -analysis -assessment -
+Topic  10 : project -semester -data -management -risk -engineering -research -systems -design -plan -
 alpha =  1.01 &amp; beta = 1.01
-- Topic  1 : design -project -methods -report -work -engineering -skills -semester -plan -week -
-- Topic  2 : cell -biology -methods -molecular -biological -content -note -protein -cells -chemical -
-- Topic  3 : design -methods -data -project -research -content -paper -work -presentation -assessment -
-- Topic  4 : design -systems -methods -system -circuits -control -programming -content -processing -modeling -
-- Topic  5 : optics -content -physics -applications -methods -optical -materials -properties -imaging -skills -
-- Topic  6 : methods -quantum -materials -content -introduction -theory -image -physics -properties -magnetic -
-- Topic  7 : linear -methods -models -basic -theory -analysis -probability -statistical -data -algebra -
-- Topic  8 : data -methods -analysis -information -systems -management -class -project -concepts -content -
-- Topic  9 : methods -numerical -models -analysis -project -time -equations -content -problems -introduction -
-- Topic  10 : energy -methods -chemical -chemistry -processes -organic -heat -concepts -water -systems -
-
+Topic  1 : design -project -methods -report -work -engineering -skills -semester -plan -week -
+Topic  2 : cell -biology -methods -molecular -biological -content -note -protein -cells -chemical -
+Topic  3 : design -methods -data -project -research -content -paper -work -presentation -assessment -
+Topic  4 : design -systems -methods -system -circuits -control -programming -content -processing -modeling -
+Topic  5 : optics -content -physics -applications -methods -optical -materials -properties -imaging -skills -
+Topic  6 : methods -quantum -materials -content -introduction -theory -image -physics -properties -magnetic -
+Topic  7 : linear -methods -models -basic -theory -analysis -probability -statistical -data -algebra -
+Topic  8 : data -methods -analysis -information -systems -management -class -project -concepts -content -
+Topic  9 : methods -numerical -models -analysis -project -time -equations -content -problems -introduction -
+Topic  10 : energy -methods -chemical -chemistry -processes -organic -heat -concepts -water -systems -
 </pre>
 </div>
 </div>
@@ -12199,7 +12193,7 @@ alpha =  1.01 &amp; beta = 1.01
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>Larger is the parameter beta, more homogeneous become the topics. It is clearly the case when beta is equal to 20, almost all topics contain the same words. It does not happen when beta is small, like 1.01, the topics are more specific.</p>
+<p>Larger is the parameter $\beta$, more homogeneous become the topics. It is clearly the case when $\beta$ is equal to 20, almost all topics contain the same words. It does not happen when $\beta$ is small, like 1.01, the topics are more specific.</p>
 
 </div>
 </div>
@@ -12338,12 +12332,10 @@ Topic  10 : design -systems -optical -methods -data -project -optics -engineerin
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>We chose k = 30, alpha = 1.01 and beta = 1.01 because :</p>
-<ul>
-<li>EPFL has documents about lots of topics, so k needs to be high enough to create sufficiently enough topics</li>
-<li>alpha should be small enough, since subject of EPFL's classes are usually containing only one topic. </li>
-<li>beta should be small, so that topics are not too similar</li>
-</ul>
+<p>Large values of $\alpha, \beta$ (&gt; 1) tend towards a uniform posterior, which means the topics will be very similar.</p>
+<p>Small values of $\alpha, \beta$ (&lt; 1) tend towards a small set of dominant topics, which means the topics will lose their relation and meaning.</p>
+<p>Therefore, we chose $\alpha = \beta = 1.01$</p>
+<p>Concerning the k parameter, EPFL has documents about lots of topics, so k needs to be high enough to create sufficiently enough topics</p>
 
 </div>
 </div>
@@ -12404,27 +12396,27 @@ Topic  10 : data -project -methods -paper -assessment -work -group -content -res
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>k = 15 &amp; alpha =  1.01  &amp; beta =  1.01 :</p>
+<p>k = 15 &amp; $\alpha$ =  1.01  &amp; $\beta$ =  1.01 :</p>
 <ul>
-<li>digital tools : 
+<li><strong>digital tools</strong> : 
 design -data -systems -system -methods -programming -modeling -digital -tools -teaching -</li>
-<li>magnetic cells : 
+<li><strong>magnetic cells</strong> : 
 magnetic -methods -cell -materials -content -drug -cells -note -molecular -introduction -</li>
-<li>chemical properties of protein : 
+<li><strong>chemical properties of protein</strong> : 
 materials -chemical -chemistry -methods -properties -protein -structure -molecular -reaction -content -</li>
-<li>electron analysis : 
+<li><strong>electron analysis</strong> : 
 methods -microscopy -electron -design -content -business -analysis -keywords -assessment -class -</li>
-<li>transversal skills : 
+<li><strong>transversal skills</strong> : 
 methods -skills -transversal -work -content -concepts -outcomes -assessment -presentation -physical -</li>
-<li>stochastic models in finance : 
+<li><strong>stochastic models in finance</strong> : 
 models -methods -theory -model -time -stochastic -financial -risk -finance -heat -</li>
-<li>quantum methods : 
+<li><strong>quantum methods</strong> : 
 quantum -methods -content -theory -properties -basic -outcomes -systems -prerequisites -snow -</li>
-<li>energy systems : 
+<li><strong>energy systems</strong> : 
 energy -project -methods -plan -skills -process -design -systems -conversion -outcomes -</li>
-<li>circuits and systems noise : 
+<li><strong>circuits and systems noise</strong> : 
 methods -circuits -content -design -systems -noise -basic -devices -exercises -organic -</li>
-<li>project group : 
+<li><strong>project group</strong> : 
 data -project -methods -paper -assessment -work -group -content -research -activities -</li>
 </ul>
 
@@ -12454,14 +12446,15 @@ data -project -methods -paper -assessment -work -group -content -research -activ
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>By looking at all the different words, we can see that there exists words in different languages. Thus the topics which should be retrieved should take into accounts the languages, leading to a less strict beta variable. Alpha variable should also be a bit increased since wikipedia pages may contain several topics (generally a wikipedia page can collect various topics). The variable k is also increased since wikipedia can contain a very large set of topics.</p>
+<p>By following the same reasoning as for the EPFL dataset, we fixed the $\alpha$ and $\beta$ to their minimum 1.01.</p>
+<p>The variable k is also increased since wikipedia can contain a very large set of topics.</p>
 
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[47]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">json</span>
@@ -12475,17 +12468,16 @@ data -project -methods -paper -assessment -work -group -content -research -activ
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[48]:</div>
+<div class="prompt input_prompt">In&nbsp;[3]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1">#Group words in order to obtain a word list</span>
-    <span class="c1">#add a counter</span>
-    <span class="c1">#reducebykey to group words</span>
-    <span class="c1">#descending sort on number of recurrence</span>
-<span class="n">mostReccurentWords1</span> <span class="o">=</span> <span class="n">wikipedia</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span>\
+<span class="c1">#even if the wikipedia set is preprocessed, we need to clean it a bit more</span>
+<span class="n">wikiProcessedWords</span> <span class="o">=</span> <span class="n">wikipedia</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span>\
 <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span> <span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="n">x</span><span class="o">.</span><span class="n">isalpha</span><span class="p">()])</span>\
-<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span> <span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">])</span>\
-<span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>\
+<span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">w</span> <span class="p">:</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">w</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">3</span><span class="p">])</span>
+
+<span class="n">mostReccurentWords1</span> <span class="o">=</span> <span class="n">processedWords</span><span class="o">.</span><span class="n">flatMap</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)</span>\
 <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">word</span><span class="p">:</span> <span class="p">(</span><span class="n">word</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>\
 <span class="o">.</span><span class="n">reduceByKey</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">,</span><span class="n">y</span><span class="p">:</span> <span class="n">x</span> <span class="o">+</span> <span class="n">y</span><span class="p">)</span>\
 <span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="p">(</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>\
@@ -12494,8 +12486,17 @@ data -project -methods -paper -assessment -work -group -content -research -activ
     
 <span class="c1"># get all possible words and map them to an id</span>
 <span class="n">wordsList1</span> <span class="o">=</span> <span class="n">mostReccurentWords1</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">collectAsMap</span><span class="p">()</span>
-
 <span class="n">distinctNbWords1</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">wordsList1</span><span class="p">)</span>
+
+
+<span class="c1"># transform indices into corresponding words</span>
+<span class="n">wordsList_helper1</span> <span class="o">=</span> <span class="n">mostReccurentWords1</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
+
+
+<span class="c1"># get correct format to submit to lda</span>
+    <span class="c1"># zipWithIndex to obtain an id for the document</span>
+    <span class="c1"># get a vector of used words</span>
+<span class="n">documents1</span> <span class="o">=</span> <span class="n">wikiProcessedWords</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">documentToVector1</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
     
 <span class="c1"># get a document and return a tuple (id , vector of word occurrencies )</span>
@@ -12519,16 +12520,18 @@ data -project -methods -paper -assessment -work -group -content -research -activ
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[49]:</div>
+<div class="prompt input_prompt">In&nbsp;[7]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># transform indices into corresponding words</span>
-<span class="n">wordsList_helper1</span> <span class="o">=</span> <span class="n">mostReccurentWords1</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">.</span><span class="n">collect</span><span class="p">()</span>
-
-<span class="c1"># get right format to submit to lda</span>
-    <span class="c1"># zipWithIndex to obtain an id for the document</span>
-    <span class="c1"># get a vector of used words</span>
-<span class="n">documents1</span> <span class="o">=</span> <span class="n">wikipedia</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="s2">&quot;tokens&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">zipWithIndex</span><span class="p">()</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">documentToVector1</span><span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="k">def</span> <span class="nf">displayTopicsWords</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">,</span> <span class="n">alphaValues</span><span class="p">,</span> <span class="n">betaValues</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lda_topics</span><span class="p">)):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;alpha = &quot;</span><span class="p">,</span><span class="n">alphaValues</span><span class="p">[</span><span class="n">i</span><span class="p">],</span><span class="s2">&quot;&amp; beta =&quot;</span><span class="p">,</span><span class="n">betaValues</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;- Topic &quot;</span><span class="p">,</span><span class="n">j</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="s2">&quot;: &quot;</span><span class="p">,</span><span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">lda_topics</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="n">j</span><span class="p">][</span><span class="mi">0</span><span class="p">]:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">wordsList_helper1</span><span class="p">[</span><span class="n">w</span><span class="p">],</span><span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">()</span>
+        <span class="nb">print</span><span class="p">()</span>
 </pre></div>
 
 </div>
@@ -12538,22 +12541,47 @@ data -project -methods -paper -assessment -work -group -content -research -activ
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[17]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># create lda model</span>
-<span class="n">alphaValue_wiki</span> <span class="o">=</span> <span class="mf">3.</span>
-<span class="n">betaValue_wiki</span> <span class="o">=</span> <span class="mf">2.</span>
-<span class="n">k_wiki</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="n">alphaValue_wiki</span> <span class="o">=</span> <span class="mf">1.01</span>
+<span class="n">betaValue_wiki</span> <span class="o">=</span> <span class="mf">1.01</span>
+<span class="n">k_wiki</span> <span class="o">=</span> <span class="mi">100</span>
 
-<span class="n">lda_wiki</span> <span class="o">=</span> <span class="n">LDA</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">documents1</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">k_wiki</span><span class="p">,</span> <span class="n">docConcentration</span> <span class="o">=</span> <span class="n">alphaValue_wiki</span><span class="p">,</span> <span class="n">topicConcentration</span> <span class="o">=</span> <span class="n">betaValue_wiki</span><span class="p">)</span>
+<span class="n">lda_wiki</span> <span class="o">=</span> <span class="n">LDA</span><span class="o">.</span><span class="n">train</span><span class="p">(</span><span class="n">documents1</span><span class="p">,</span> <span class="n">k</span> <span class="o">=</span> <span class="n">k_wiki</span><span class="p">,</span> <span class="n">maxIterations</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">docConcentration</span> <span class="o">=</span> <span class="n">alphaValue_wiki</span><span class="p">,</span> <span class="n">topicConcentration</span> <span class="o">=</span> <span class="n">betaValue_wiki</span><span class="p">)</span>
 
 <span class="c1"># get topics</span>
 <span class="n">topic_indices_wiki</span> <span class="o">=</span> <span class="n">lda_wiki</span><span class="o">.</span><span class="n">describeTopics</span><span class="p">(</span><span class="n">maxTermsPerTopic</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span> <span class="c1"># 10 words to display</span>
-<span class="n">displayTopicsWords</span><span class="p">(</span><span class="n">topic_indices_wiki</span><span class="p">,</span> <span class="p">[</span><span class="n">alphaValue_wiki</span><span class="p">],</span> <span class="p">[</span><span class="n">betaValue_wiki</span><span class="p">])</span>
+<span class="n">displayTopicsWords</span><span class="p">([</span><span class="n">topic_indices_wiki</span><span class="p">],</span> <span class="p">[</span><span class="n">alphaValue_wiki</span><span class="p">],</span> <span class="p">[</span><span class="n">betaValue_wiki</span><span class="p">])</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area"><div class="prompt"></div>
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>alpha =  1.01 &amp; beta = 1.01
+- Topic  1 : time -world -united -years -american -states -city -british -people -century -
+- Topic  2 : city -time -government -years -world -states -united -century -state -american -
+- Topic  3 : time -years -american -world -united -city -states -number -century -made -
+- Topic  4 : time -world -years -states -united -number -century -city -called -government -
+- Topic  5 : american -time -years -world -united -city -states -century -government -british -
+- Topic  6 : american -time -years -city -world -united -states -century -french -made -
+- Topic  7 : time -years -world -century -united -number -states -city -called -american -
+- Topic  8 : american -time -united -years -world -british -states -government -city -century -
+- Topic  9 : error -time -world -years -american -city -states -century -united -unexpected -
+- Topic  10 : time -years -world -rajah -century -united -states -american -city -called -
+
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -12564,6 +12592,16 @@ data -project -methods -paper -assessment -work -group -content -research -activ
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h3 id="Are-you-convinced-by-the-results?-Give-labels-to-the-topics-if-possible.">Are you convinced by the results? Give labels to the topics if possible.<a class="anchor-link" href="#Are-you-convinced-by-the-results?-Give-labels-to-the-topics-if-possible.">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<p>Even if we used smallest possible values for $\alpha$ and $\beta$, the results are quite bad, since the topics are very alike (they contain very similar words at their top) and giving them distinct labels would thus be difficult.</p>
+
 </div>
 </div>
 </div>
