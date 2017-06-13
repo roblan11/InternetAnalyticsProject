@@ -11937,10 +11937,10 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <ul>
 <li>Make sure every courseId only appears once. If it appears more than once, append the two descriptions</li>
-<li>Change all cheacters to lowercase, to avoid the same word being considered different. Additionally, all words in stopwords.pkl are in lowercase, so this ensures all words are removed correctly</li>
+<li>Change all characters to lowercase, to avoid the same word being considered different. Additionally, all words in stopwords.pkl are in lowercase, so this ensures all words are removed correctly</li>
 <li>Remove punctuation, numbers and other symbols, for the same reason as above. Only the words are important, not percentages or numbers.</li>
 <li>Remove stopwords, as these don't carry any information about the content of the document</li>
-<li>filter most and least frequent words, as they only mess up the results when trying to find similarities between documents. commomn words will be in almost every document, rare ones in almost none.</li>
+<li>filter most and least frequent words, as they only mess up the results when trying to find similarities between documents. common words will be in almost every document, rare ones in almost none.</li>
 <li>Lemmatization, to detect only words with different meaning. Identical words, such as "is" and "are" will automatically be transformed to "be", the same is true with multiples ("documents" -&gt; "document").</li>
 <li>n-grams: 2-shingles, to detect frequent combinations of words. Infrequent shingles are filtered just like infrequent words. No higher degrees for the sake of performance.</li>
 </ul>
@@ -12273,7 +12273,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p>the term "facebook" only appeeared 9 times within only one description, and was therefore filtered eaclier. thus, that term has no score and no similarity can be computed</p>
+<p>The term "facebook" only appeared 9 times within only one description, and was therefore filtered eaclier. thus, that term has no score and no similarity can be computed.</p>
 
 </div>
 </div>
@@ -12325,7 +12325,7 @@ div#notebook {
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># cosine similarity function, given</span>
-<span class="c1"># the indeces of two courses</span>
+<span class="c1"># the indices of two courses</span>
 <span class="k">def</span> <span class="nf">sim</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">):</span>
     <span class="n">di</span> <span class="o">=</span> <span class="n">TFIDF</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
     <span class="n">dj</span> <span class="o">=</span> <span class="n">TFIDF</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
@@ -12442,7 +12442,7 @@ MATH-332    1.00    0.34    0.33    0.18    0.07
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">What do you think of the results? Give your intuition on what is happening.<a class="anchor-link" href="#What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">&#182;</a></h3><p>Since all we looked for were the descriptions where "markov chain(s)" appears the most, we expected to have relatively low similartiy scores. It is likely that courses that deal with markov chains have somewhat similar topics, as it is a mathematical concept at the base, but that is not at all reqired.</p>
+<h3 id="What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">What do you think of the results? Give your intuition on what is happening.<a class="anchor-link" href="#What-do-you-think-of-the-results?-Give-your-intuition-on-what-is-happening.">&#182;</a></h3><p>Since all we looked for were the descriptions where "markov chain(s)" appears the most, we expected to have relatively low similartiy scores. It is likely that courses that deal with markov chains have somewhat similar topics, as it is a mathematical concept at the base, but that is not required at all.</p>
 
 </div>
 </div>
